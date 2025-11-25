@@ -1,3 +1,5 @@
+#Table Creation AND CLEANING #
+
 ALTER TABLE layoffsp
 RENAME COLUMN `ï»¿Company`       TO company,
 RENAME COLUMN `Location HQ`     TO location,
