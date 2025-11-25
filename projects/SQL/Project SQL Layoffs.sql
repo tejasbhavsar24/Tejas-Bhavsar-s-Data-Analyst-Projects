@@ -1,4 +1,4 @@
-#Table Creation AND CLEANING #
+# DATA CLEANING
 
 ALTER TABLE layoffsp
 RENAME COLUMN `ï»¿Company`       TO company,
