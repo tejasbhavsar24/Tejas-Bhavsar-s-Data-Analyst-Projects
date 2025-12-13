@@ -3,7 +3,7 @@
 
 - [Project Overview](#1-project-overview)
 - [Business Objectives & Research Questions](#2-business-objectives--research-questions)
-- [SQL Functions & Key Assumptions](#3-sql-functions--key-assumptions)
+- [SQL Functions and Key Assumptions](#3-sql-functions-and-key-assumptions)
 - [Data Model & Schema](#4-data-model--schema)
 - [How to Run the SQL](#5-how-to-run-the-sql)
 - [Using Views and Processed Tables](#6-using-views-and-processed-tables)
@@ -14,6 +14,7 @@
   - [Cancellations, Refunds & Food Rescue](#74-cancellations-refunds--food-rescue)
 - [Recommendations for Zomato](#8-recommendations-for-zomato)
 - [My Role and Learnings](#9-my-role-and-learnings)
+
 
 ## 1. Project Overview
 
@@ -51,7 +52,49 @@ The work is structured as a production‑style analytics project: data cleaning,
 
 ## 3.  SQL Functions and Key Assumptions
 
-In this project, various SQL functions are utilized for finding answers to business queries. These include Common Table Expressions (CTEs), Window Functions, Temporary Tables, Views and Date - Time Functions.
+In this project, various SQL functions are utilized for finding answers to business queries. The following functions were used for the project:
+
+**Aggregate functions**
+COUNT, SUM, AVG, MIN, MAX
+Used to compute orders, revenue, refunds, AOV, delivery times, and customer metrics.
+
+**Conditional logic**
+CASE WHEN
+Used to:
+-Classify order status (completed vs cancelled)
+-Identify funnel stages from pageview URLs
+-Segment customers into RFM categories
+
+**Window functions**
+ROW_NUMBER, RANK, DENSE_RANK, NTILE
+Used for:
+-RFM scoring and segmentation
+-Ranking cities, cuisines, and customers
+-Creating percentiles and cohorts without data loss
+
+**Date & time functions**
+DATE, EXTRACT, DATEDIFF, TIMESTAMPDIFF,LAG
+Used to:
+-Calculate recency and frequency windows
+-Derive order hour, day, and month trends
+-Measure delivery time and session-to-order latency
+
+**Joins**
+INNER JOIN, LEFT JOIN
+Used to combine user, session, order, item, restaurant, and cancellation data while preserving analytical integrity.
+
+**Null handling & data safety**
+COALESCE, NULLIF
+Used to:
+-Avoid divide-by-zero errors
+-Handle missing cancellations or refunds cleanly
+-Ensure consistent metric calculation
+
+**Views and temporary tables**
+CREATE VIEW, WITH (CTEs), temporary tables
+Used to modularise logic, improve readability, and allow re-use across multiple analyses (funnel, revenue, RFM).
+
+**Key Assumptions:**
 
 When calculating Revenue of Zomato, the following assumptions are taken for ensuring results and values are comparable:
 •  **Completed** : Zomato earns 30% commission + delivery_fee_paid.
