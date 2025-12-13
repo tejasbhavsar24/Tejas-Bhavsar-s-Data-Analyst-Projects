@@ -3,7 +3,7 @@
 
 - [Project Overview](#1-project-overview)
 - [Business Objectives & Research Questions](#2-business-objectives--research-questions)
-- [SQL Functions and Key Assumptions](#3-sql-functions--key-assumptions)
+- [SQL Functions and Key Assumptions](#3-sql-functions-and-key-assumptions)
 - [Data Model & Schema](#4-data-model--schema)
 - [How to Run the SQL](#5-how-to-run-the-sql)
 - [Using Views and Processed Tables](#6-using-views-and-processed-tables)
@@ -50,7 +50,7 @@ The work is structured as a production‑style analytics project: data cleaning,
 
 ---
 
-## 3.  SQL Functions & Key Assumptions
+## 3. SQL Functions and Key Assumptions
 
 In this project, various SQL functions are utilized for finding answers to business queries. The following functions were used for the project:
 
