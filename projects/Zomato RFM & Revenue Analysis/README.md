@@ -220,7 +220,7 @@ Cuisine-level ranking consistently places Biryani and Mughlai dishes at the top 
 
 Temporal analysis shows that demand peaks sharply during the evening dinner window (7 PM–10 PM), with 8 PM recording the highest volume **(703 orders)**, followed closely by 9 PM **(659 orders)**. Weekends (Friday–Sunday) exhibit clear uplift during evening hours, while lunch demand peaks moderately between 1 PM–3 PM. Early-morning ordering remains minimal, with the 5 AM spike **(711 orders)** identified as a synthetic data artifact rather than real behaviour. These findings reinforce Zomato’s focus on late-night delivery, weekend campaigns, and time-based offers, while also validating recent experiments aimed at uplifting underperforming breakfast hours.
 
-### 7.3 Month - on - Month Revenue Performance
+### 7.3 Month-on-Month Revenue Performance
 
 Month-on-month analysis reveals distinct seasonal and strategic phases. After peaking in October 2024 (1,270+ orders; ₹187.6 platform revenue per order), performance declined into early 2025, with February marking the lowest point **(–17.1% MoM orders, –13.7% revenue)**. Despite lower volumes, platform revenue per order peaked at **₹196**, indicating a shift toward higher monetisation and profitability.
 A recovery began in March–April, with May–June 2025 reaching new highs in both orders and revenue, supported by summer demand, IPL-driven engagement, and user adaptation to revised pricing. Rolling 3-month metrics reflect Zomato’s strategic transition from discount-led growth to profitability and AOV-driven expansion.
