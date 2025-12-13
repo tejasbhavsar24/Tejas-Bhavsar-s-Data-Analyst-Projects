@@ -241,9 +241,11 @@ Post–Food Rescue implementation, the cancellation rate dropped sharply from **
 **Marketing & Growth**
 
 i) **Strengthen a mobile-first strategy and reduce desktop focus:**
+
 Mobile contributes the majority of sessions, orders, and revenue, with high conversion rates of around 74–76% and ARPU of about ₹172. This confirms that Zomato’s growth and monetisation depend primarily on mobile users. The company should invest more in mobile UX improvements, app-only campaigns, and web-to-app conversion offers. Desktop and tablet platforms show lower traffic and revenue and can be deprioritised.
 
 ii) **Use channels differently for growth and revenue:**
+
 Direct App traffic and Google are the highest revenue sources, generating around ₹40.2 lakh and ₹20.1 lakh GMV and over 8,000 orders combined. This shows strong brand recall and habitual usage. Social channels such as Facebook and Instagram drive high traffic and order volume but lower AOV (₹227–239 compared to ₹233–238 for Direct). These channels should be used mainly for acquisition and app installs, while Direct App traffic should be optimised for higher basket size and repeat usage.
 
 iii) **Build segment‑specific strategies:**
