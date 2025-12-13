@@ -244,7 +244,7 @@ RFM analysis highlights Loyal Customers as the core revenue driver, representing
 Gold members exhibit lower cancellation rates (0.35 vs 0.47) and higher AOV within top segments, indicating stronger loyalty and reduced price sensitivity. However, Gold adoption remains limited, with 80% of revenue still coming from non-Gold users, highlighting a strong opportunity for targeted membership conversion among high-spend cohorts.
 
 RFM Segments
-<img width="1055" height="532" alt="image" src="https://github.com/user-attachments/assets/816d95ea-a333-4f54-94e7-cb16571b91c8" />
+<img width="1055" height="609" alt="image" src="https://github.com/user-attachments/assets/d5676a50-6c4a-4918-9dfe-470d0f4cb459" />
 
 
 GOLD VS NON GOLD
