@@ -1,4 +1,18 @@
-# Zomato SQL Analytics – User Behaviour, Revenue, Funnel & RFM
+# Zomato SQL Analytics – User Behaviour, Revenue, Funnel & RFM | July 2024 - June 2025 Dataset
+## 📌 Table of Contents
+
+- [Project Overview](#1-project-overview)
+- [Business Objectives & Research Questions](#2-business-objectives--research-questions)
+- [Data Model & Schema](#3-data-model--schema)
+- [How to Run the SQL](#5-how-to-run-the-sql)
+- [Using Views and Processed Tables](#6-using-views-and-processed-tables)
+- [Key Insights (Business Summary)](#7-key-insights-business-summary)
+  - [UX Funnel & Channel Performance](#71-ux-funnel--channel-performance)
+  - [City, Cuisine & Demand Patterns](#72-city-cuisine--demand-patterns)
+  - [RFM & Gold Membership](#73-rfm--gold-membership)
+  - [Cancellations, Refunds & Food Rescue](#74-cancellations-refunds--food-rescue)
+- [Recommendations for Zomato](#8-recommendations-for-zomato)
+- [My Role and Learnings](#9-my-role-and-learnings)
 
 ## 1. Project Overview
 
