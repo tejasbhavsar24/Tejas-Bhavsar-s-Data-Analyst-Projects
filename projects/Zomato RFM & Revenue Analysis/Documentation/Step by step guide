@@ -1,180 +1,159 @@
-# Zomato End-to-End SQL Analytics Workflow Guide
+A complete, step-by-step guide for executing SQL analytics on Zomato-style transactional data.
+This project covers data cleaning, quality checks, UX funnel analysis, channel & device performance, city-wise insights, and RFM customer segmentation.
 
-Complete step-by-step guide for executing SQL analytics on Zomato transactional data. Covers data cleaning, quality checks, and five analysis modules from funnel to customer segmentation.
+📌 Project Structure
+zomato-sql-analytics/
+│
+├── data/
+│   ├── users.csv
+│   ├── app_sessions.csv
+│   ├── app_pageviews.csv
+│   ├── orders.csv
+│   ├── order_items.csv
+│   ├── order_items_cancelled.csv
+│   ├── restaurants.csv
+│   └── menu.csv
+│
+├── sql/
+│   ├── 01_data_setup.sql
+│   ├── 02_funnel_analysis.sql
+│   ├── 03_channel_device_analysis.sql
+│   ├── 04_city_analysis.sql
+│   └── 05_rfm_segmentation.sql
+│
+└── README.md
 
----
+🧩 Part 1: Database Setup & Data Cleaning
+Overview
 
-## Part 1: Database Setup & Data Cleaning
+Import 8 CSV files into MySQL and validate data integrity before analysis.
 
-### Overview
-Import 8 CSV files into MySQL and verify data integrity before analysis.
-
-### Step 1.1: Create Database
-
-```sql
+1.1 Create Database
 CREATE DATABASE zomato;
 USE zomato;
-```
 
-### Step 1.2: Import CSV Files
-
-Import each table from CSV files:
-
-```sql
-LOAD DATA INFILE '/path/to/users.csv' 
-INTO TABLE users 
-FIELDS TERMINATED BY ',' 
-ENCLOSED BY '"' 
-LINES TERMINATED BY '\n' 
+1.2 Import CSV Files
+LOAD DATA INFILE '/path/to/users.csv'
+INTO TABLE users
+FIELDS TERMINATED BY ','
+ENCLOSED BY '"'
+LINES TERMINATED BY '\n'
 IGNORE 1 ROWS;
 
-LOAD DATA INFILE '/path/to/app_sessions.csv' 
-INTO TABLE app_sessions 
-FIELDS TERMINATED BY ',' 
-ENCLOSED BY '"' 
-LINES TERMINATED BY '\n' 
+LOAD DATA INFILE '/path/to/app_sessions.csv'
+INTO TABLE app_sessions
+FIELDS TERMINATED BY ','
+ENCLOSED BY '"'
+LINES TERMINATED BY '\n'
 IGNORE 1 ROWS;
 
-LOAD DATA INFILE '/path/to/app_pageviews.csv' 
-INTO TABLE app_pageviews 
-FIELDS TERMINATED BY ',' 
-ENCLOSED BY '"' 
-LINES TERMINATED BY '\n' 
+LOAD DATA INFILE '/path/to/app_pageviews.csv'
+INTO TABLE app_pageviews
+FIELDS TERMINATED BY ','
+ENCLOSED BY '"'
+LINES TERMINATED BY '\n'
 IGNORE 1 ROWS;
 
-LOAD DATA INFILE '/path/to/orders.csv' 
-INTO TABLE orders 
-FIELDS TERMINATED BY ',' 
-ENCLOSED BY '"' 
-LINES TERMINATED BY '\n' 
+LOAD DATA INFILE '/path/to/orders.csv'
+INTO TABLE orders
+FIELDS TERMINATED BY ','
+ENCLOSED BY '"'
+LINES TERMINATED BY '\n'
 IGNORE 1 ROWS;
 
-LOAD DATA INFILE '/path/to/order_items.csv' 
-INTO TABLE order_items 
-FIELDS TERMINATED BY ',' 
-ENCLOSED BY '"' 
-LINES TERMINATED BY '\n' 
+LOAD DATA INFILE '/path/to/order_items.csv'
+INTO TABLE order_items
+FIELDS TERMINATED BY ','
+ENCLOSED BY '"'
+LINES TERMINATED BY '\n'
 IGNORE 1 ROWS;
 
-LOAD DATA INFILE '/path/to/order_items_cancelled.csv' 
-INTO TABLE order_items_cancelled 
-FIELDS TERMINATED BY ',' 
-ENCLOSED BY '"' 
-LINES TERMINATED BY '\n' 
+LOAD DATA INFILE '/path/to/order_items_cancelled.csv'
+INTO TABLE order_items_cancelled
+FIELDS TERMINATED BY ','
+ENCLOSED BY '"'
+LINES TERMINATED BY '\n'
 IGNORE 1 ROWS;
 
-LOAD DATA INFILE '/path/to/restaurants.csv' 
-INTO TABLE restaurants 
-FIELDS TERMINATED BY ',' 
-ENCLOSED BY '"' 
-LINES TERMINATED BY '\n' 
+LOAD DATA INFILE '/path/to/restaurants.csv'
+INTO TABLE restaurants
+FIELDS TERMINATED BY ','
+ENCLOSED BY '"'
+LINES TERMINATED BY '\n'
 IGNORE 1 ROWS;
 
-LOAD DATA INFILE '/path/to/menu.csv' 
-INTO TABLE menu 
-FIELDS TERMINATED BY ',' 
-ENCLOSED BY '"' 
-LINES TERMINATED BY '\n' 
+LOAD DATA INFILE '/path/to/menu.csv'
+INTO TABLE menu
+FIELDS TERMINATED BY ','
+ENCLOSED BY '"'
+LINES TERMINATED BY '\n'
 IGNORE 1 ROWS;
-```
 
-### Step 1.3: Verify Data Import
+1.3 Verify Data Import
+SELECT COUNT(*) AS users_count FROM users;
+SELECT COUNT(*) AS sessions_count FROM app_sessions;
+SELECT COUNT(*) AS orders_count FROM orders;
+SELECT COUNT(*) AS pageviews_count FROM app_pageviews;
+SELECT COUNT(*) AS order_items_count FROM order_items;
+SELECT COUNT(*) AS cancelled_count FROM order_items_cancelled;
+SELECT COUNT(*) AS restaurants_count FROM restaurants;
+SELECT COUNT(*) AS menu_items_count FROM menu;
 
-Count records in each table to confirm successful import:
-
-```sql
-SELECT COUNT(*) as users_count FROM users;
-SELECT COUNT(*) as sessions_count FROM app_sessions;
-SELECT COUNT(*) as orders_count FROM orders;
-SELECT COUNT(*) as pageviews_count FROM app_pageviews;
-SELECT COUNT(*) as order_items_count FROM order_items;
-SELECT COUNT(*) as cancelled_count FROM order_items_cancelled;
-SELECT COUNT(*) as restaurants_count FROM restaurants;
-SELECT COUNT(*) as menu_items_count FROM menu;
-```
-
-### Step 1.4: Check for Duplicates
-
-Verify user IDs are unique (primary key constraint):
-
-```sql
-SELECT user_id, COUNT(*) as count 
-FROM users 
-GROUP BY user_id 
+1.4 Duplicate Checks
+SELECT user_id, COUNT(*) AS count
+FROM users
+GROUP BY user_id
 HAVING COUNT(*) > 1;
-```
+
 
 Expected: 0 rows
 
-### Step 1.5: Check for Orphaned Records
-
-Verify all orders have matching sessions:
-
-```sql
-SELECT COUNT(*) as orphaned_orders
+1.5 Orphan Record Check
+SELECT COUNT(*) AS orphaned_orders
 FROM orders o
-LEFT JOIN app_sessions s ON o.app_session_id = s.app_session_id
+LEFT JOIN app_sessions s
+ON o.app_session_id = s.app_session_id
 WHERE s.app_session_id IS NULL;
-```
+
 
 Expected: 0 rows
 
-### Step 1.6: Check for Data Anomalies
-
-Check for impossible values:
-
-```sql
-SELECT COUNT(*) as negative_refunds 
-FROM order_items_cancelled 
+1.6 Data Anomaly Checks
+SELECT COUNT(*) AS negative_refunds
+FROM order_items_cancelled
 WHERE amount_of_refund < 0;
 
-SELECT COUNT(*) as future_orders 
-FROM orders 
+SELECT COUNT(*) AS future_orders
+FROM orders
 WHERE order_time > CURDATE();
-```
 
-Expected: 0 rows for both
 
-### Step 1.7: Verify Null Handling
+Expected: 0 rows
 
-Check for null values in critical columns:
-
-```sql
-SELECT 
-  SUM(CASE WHEN user_id IS NULL THEN 1 ELSE 0 END) as null_users,
-  SUM(CASE WHEN order_id IS NULL THEN 1 ELSE 0 END) as null_orders,
-  SUM(CASE WHEN total_price IS NULL THEN 1 ELSE 0 END) as null_prices,
-  SUM(CASE WHEN delivery_time IS NULL THEN 1 ELSE 0 END) as null_delivery_times
+1.7 Null Value Checks
+SELECT
+  SUM(CASE WHEN user_id IS NULL THEN 1 ELSE 0 END) AS null_users,
+  SUM(CASE WHEN order_id IS NULL THEN 1 ELSE 0 END) AS null_orders,
+  SUM(CASE WHEN total_price IS NULL THEN 1 ELSE 0 END) AS null_prices,
+  SUM(CASE WHEN delivery_time IS NULL THEN 1 ELSE 0 END) AS null_delivery_times
 FROM orders;
-```
 
----
+🧭 Part 2: UX Funnel Analysis
+Overview
 
-## Part 2: UX Funnel Analysis
+Track the user journey from homepage → order completion, identify drop-offs and cart abandonment.
 
-### Overview
-Track user journey from homepage to order completion. Identify drop-off points and cart abandonment rates.
-
-### Step 2.1: Create Cancelled Orders Aggregation
-
-```sql
+2.1 Cancelled Orders Aggregation
 CREATE TEMPORARY TABLE cancelled_orders AS
-
 SELECT
     order_id,
     SUM(amount_of_refund) AS total_refunds,
-    MAX(created_at) as cancelled_at
+    MAX(created_at) AS cancelled_at
 FROM order_items_cancelled
 GROUP BY order_id;
-```
 
-Aggregates refund data by order ID to prepare for net revenue calculation.
-
-### Step 2.2: Calculate Net Revenue per Order
-
-```sql
+2.2 Net Revenue per Order
 CREATE TEMPORARY TABLE net_GMV_orders AS
-
 SELECT
     o.order_id,
     o.app_session_id,
@@ -194,16 +173,10 @@ SELECT
     END AS net_revenue
 FROM orders o
 LEFT JOIN cancelled_orders c
-    ON o.order_id = c.order_id;
-```
+ON o.order_id = c.order_id;
 
-Joins orders with cancellations and calculates net revenue (order value minus delivery fee) for each order. CASE statement marks order status and handles refunds for cancelled orders.
-
-### Step 2.3: Create Funnel Stage Flags
-
-```sql
+2.3 Funnel Stage Flags
 CREATE TEMPORARY TABLE pageviews_per_session AS
-
 SELECT
     app_session_id,
     MAX(CASE WHEN pageview_url = '/home-page' THEN 1 ELSE 0 END) AS homepage_views,
@@ -213,15 +186,9 @@ SELECT
     MAX(CASE WHEN pageview_url = '/cart' THEN 1 ELSE 0 END) AS cart_views
 FROM app_pageviews
 GROUP BY app_session_id;
-```
 
-Uses MAX(CASE) to detect if user reached each funnel stage. Returns 1 if visited, 0 if not. Groups by session to track journey per session.
-
-### Step 2.4: Aggregate Orders per Session
-
-```sql
+2.4 Orders per Session
 CREATE TEMPORARY TABLE orders_per_sessions AS
-
 SELECT
     app_session_id,
     COUNT(DISTINCT CASE WHEN order_status = 'Completed' THEN order_id END) AS completed_orders,
@@ -231,533 +198,31 @@ SELECT
     SUM(net_revenue) AS net_revenue_all_orders
 FROM net_GMV_orders
 GROUP BY app_session_id;
-```
 
-Counts completed vs cancelled orders per session and calculates revenue. Uses COUNT(DISTINCT) to avoid double-counting if multiple items per order.
-
-### Step 2.5: Complete Funnel Analysis
-
-```sql
+2.5 Funnel Metrics
 SELECT
     SUM(s.homepage_views) AS homepage_sessions,
     SUM(s.search_views) AS search_sessions,
-    ROUND(sum(s.search_views) * 100 / NULLIF(sum(s.homepage_views), 0),2) AS pct_home_to_search_sessions,
-    
+    ROUND(SUM(s.search_views) * 100 / NULLIF(SUM(s.homepage_views),0),2) AS pct_home_to_search,
+
     SUM(s.restaurants_views) AS restaurants_sessions,
-    ROUND(sum(s.restaurants_views) * 100 / NULLIF(sum(s.search_views), 0),2) AS pct_search_to_restaurants_sessions,
-    
+    ROUND(SUM(s.restaurants_views) * 100 / NULLIF(SUM(s.search_views),0),2) AS pct_search_to_restaurants,
+
     SUM(s.menu_views) AS menu_sessions,
-    ROUND(sum(s.menu_views) * 100 / NULLIF(sum(s.restaurants_views), 0),2) AS pct_restaurants_to_menu_sessions,
-    
+    ROUND(SUM(s.menu_views) * 100 / NULLIF(SUM(s.restaurants_views),0),2) AS pct_restaurants_to_menu,
+
     SUM(s.cart_views) AS cart_sessions,
-    ROUND(sum(s.cart_views) * 100 / NULLIF(sum(s.menu_views), 0),2) AS pct_menu_to_cart_sessions,
-    
+    ROUND(SUM(s.cart_views) * 100 / NULLIF(SUM(s.menu_views),0),2) AS pct_menu_to_cart,
+
     SUM(o.completed_orders) AS placed_orders,
-    ROUND(sum(o.completed_orders) * 100 / NULLIF(sum(s.cart_views), 0),2) AS pct_cart_to_order_sessions,
-    
-    ROUND(100 - (sum(o.completed_orders) * 100 / NULLIF(sum(s.cart_views), 0)), 2) AS cart_abandonment_rate,
-    
+    ROUND(SUM(o.completed_orders) * 100 / NULLIF(SUM(s.cart_views),0),2) AS pct_cart_to_order,
+
+    ROUND(100 - (SUM(o.completed_orders) * 100 / NULLIF(SUM(s.cart_views),0)),2) AS cart_abandonment_rate,
+
     SUM(o.net_revenue_completed_orders) AS total_revenue,
     (-1 * SUM(o.net_revenue_cancelled_orders)) AS total_refunds,
     SUM(o.net_revenue_all_orders) AS net_revenue_all_orders,
-    avg(o.net_revenue_all_orders) AS net_revenue_per_order
-FROM pageviews_per_session as s
-LEFT JOIN orders_per_sessions as o
-    ON s.app_session_id = o.app_session_id;
-```
-
-Calculates conversion percentages at each funnel stage using NULLIF to prevent division by zero. Computes cart abandonment rate and total/average revenue metrics.
-
-**Insight**: Zomato has strong UX funnel with 97%+ conversions until cart. Cart abandonment at 12.2% is the critical bottleneck where price sensitivity, missing discounts, and payment friction cause users to abandon.
-
----
-
-## Part 3: Channel & Device Performance Analysis
-
-### Overview
-Identify which acquisition channels and device types drive highest revenue and conversion rates.
-
-### Step 3.1: Create Channel Performance View
-
-```sql
-create view vw_channel_performance AS
-
-SELECT s.utm_source,s.device_type,
-
-count(o.order_id) AS total_orders,
-
-COUNT(DISTINCT s.app_session_id) AS unique_sessions,
-
-COUNT(DISTINCT s.user_id) AS unique_users,
-
-SUM(o.total_price) AS GMV,
-
-ROUND(count(o.order_id) * 100 / count(DISTINCT s.app_session_id),2) AS conversion_rate,
-
-AVG(o.total_price) AS AOV
-
-from app_sessions s
-
-left join orders o
-
-on s.app_session_id = o.app_session_id
-
-group by s.utm_source, s.device_type
-
-order by GMV DESC;
-```
-
-Creates view combining sessions with orders. Uses COUNT(DISTINCT) to count unique sessions and users. Calculates conversion (orders/sessions) and average order value.
-
-### Step 3.2: Query Channel Performance
-
-```sql
-SELECT s.utm_source,
-
-count(o.order_id) AS total_orders,
-
-COUNT(DISTINCT s.app_session_id) AS unique_sessions,
-
-COUNT(DISTINCT s.user_id) AS unique_users,
-
-SUM(o.total_price) AS GMV,
-
-ROUND(count(o.order_id) * 100 / count(DISTINCT s.app_session_id),2) AS conversion_rate,
-
-AVG(o.total_price) AS AOV
-
-from app_sessions s
-
-left join orders o
-
-on s.app_session_id = o.app_session_id
-
-group by s.utm_source
-
-order by GMV DESC;
-```
-
-Aggregates all sessions by channel source. Conversion rate = orders divided by sessions, shows how effective each channel is.
-
-**Insight**: Direct channel is top performer (₹40.2L GMV, 78.2% conversion), indicating strong brand recognition, recall and loyalty. Social channels bring strong volume but lower AOV - price-sensitive users. Direct has highest conversion rates, reflecting strong retention marketing strategy.
-
-### Step 3.3: Query Device Performance
-
-```sql
-CREATE TEMPORARY TABLE net_order_sessions AS
-
-SELECT
-    o.order_id,
-    o.app_session_id,
-    o.restaurant_id,
-    o.order_time,
-    COALESCE(o.delivery_time, c.cancelled_at) AS final_time,
-    o.delivery_fee_paid,
-    o.total_price,
-    c.total_refunds,
-    CASE
-        WHEN c.order_id IS NOT NULL THEN 'Cancelled'
-        ELSE 'Completed'
-    END AS order_status,
-    CASE
-        WHEN c.order_id IS NOT NULL THEN -c.total_refunds
-        ELSE o.total_price - o.delivery_fee_paid
-    END AS net_revenue
-FROM orders o
-LEFT JOIN cancelled_orders c
-    ON o.order_id = c.order_id;
-
-SELECT s.device_type,
-
-count(n.order_id) AS total_orders,
-
-COUNT(DISTINCT s.app_session_id) AS unique_sessions,
-
-COUNT(DISTINCT s.user_id) AS unique_users,
-
-SUM(n.total_price) AS GMV,
-
-ROUND(count(n.order_id) * 100 / count(DISTINCT s.app_session_id),2) AS Conversion_Rate,
-
-ROUND(COALESCE(sum(n.net_revenue) / count(DISTINCT s.app_session_id)),2) AS Average_Revenue_Per_Session
-
-from app_sessions s
-
-left join net_order_sessions n
-
-on s.app_session_id = n.app_session_id
-
-group by s.device_type
-
-order by GMV DESC;
-```
-
-Prepares net revenue table, then aggregates by device type. Calculates average revenue per session (net revenue / sessions).
-
-**Insight**: Mobile dominates usage and revenue (71% of sessions, 74% conversion, ₹172 ARPU). Mobile has high conversion rates and high revenue per session. Should focus on mobile UX optimization and mobile-only campaigns. Reduce desktop investments as it contributes less despite similar ARPU.
-
----
-
-## Part 4: City-Wise Revenue Analysis
-
-### Overview
-Understand revenue patterns, customer preferences, and city market maturity across metros.
-
-### Step 4.1: City Performance Aggregation
-
-```sql
-CREATE TEMPORARY TABLE city_performance AS
-
-SELECT r.city,
-
-COUNT(o.order_id) AS total_orders,
-
-COUNT(oc.order_id) AS cancelled_orders,
-
-ROUND((COUNT(oc.order_id)*100) / COUNT(o.order_id), 2) AS cancellation_rate,
-
-ROUND(SUM(o.total_price), 2) AS GMV,
-
-ROUND(SUM(o.total_price) / COUNT(o.order_id),2) AS AOV,
-
-SUM(o.delivery_fee_paid) AS total_delivery_fee,
-
-ROUND(SUM((0.30*o.total_price) + o.delivery_fee_paid), 2) AS zomato_gross_revenue,
-
-ROUND(SUM(COALESCE(oc.amount_of_refund, 0)),2) AS refund_loss,
-
-SUM(CASE
-
-WHEN oc.order_id IS NULL THEN (0.30*o.total_price + o.delivery_fee_paid)
-
-ELSE (0.30*o.total_price + o.delivery_fee_paid - oc.amount_of_refund)
-
-END) AS zomato_net_revenue,
-
-ROUND(SUM((0.30*o.total_price) + o.delivery_fee_paid) / COUNT(DISTINCT s.app_session_id), 2) AS ARPS,
-
-AVG(TIMESTAMPDIFF(MINUTE, o.order_time, o.delivery_time)) AS avg_delivery_time,
-
-AVG(o.delivery_fee_paid) AS avg_delivery_fee
-
-FROM orders o
-
-LEFT JOIN order_items_cancelled oc
-
-ON o.order_id = oc.order_id
-
-LEFT JOIN restaurants r
-
-ON o.restaurant_id = r.restaurant_id
-
-LEFT JOIN app_sessions s
-
-ON o.app_session_id = s.app_session_id
-
-GROUP BY r.city
-
-ORDER BY zomato_net_revenue DESC;
-
-SELECT *,
-
-ROUND((zomato_net_revenue * 100 / GMV),2) AS margin_pct
-
-FROM city_performance;
-```
-
-Aggregates orders by city. Calculates 30% commission + delivery fee as Zomato gross revenue. Uses SUM(CASE) to handle refunds for cancelled orders. TIMESTAMPDIFF calculates delivery time in minutes. Final SELECT adds margin percentage (net revenue / GMV).
-
-**Insight**: Bangalore leads in volume (2,891 orders) with premium AOV (₹892), indicating mature market saturation. Hyderabad has strong potential as emerging premium market with 2nd highest volume, highest AOV (₹867), and lowest cancellation rate (18%), showing high satisfaction. Kolkata is smaller but represents premium high-loyalty market with highest margin (31.6%). Delhi shows highest cancellation (21%), indicating need for experience improvement.
-
-### Step 4.2: Top Foods by City
-
-```sql
-WITH food_city_zomato AS(
-
-SELECT
-
-r.city,
-
-TRIM(LOWER(m.fooditem_name)) AS foodname, sum(oi.quantity) AS total_orders,
-
-DENSE_RANK() OVER(PARTITION BY r.city ORDER BY SUM(oi.quantity) DESC) AS most_ordered_food
-
-FROM order_items oi
-
-JOIN menu m
-
-ON oi.food_item_id = m.food_item_id
-
-JOIN restaurants r
-
-ON r.restaurant_id = m.restaurant_id
-
-GROUP BY r.city, TRIM(LOWER(m.fooditem_name))
-
-)
-
-SELECT city, foodname, total_orders
-
-FROM food_city_zomato
-
-WHERE most_ordered_food <= 4
-
-ORDER BY city, total_orders DESC;
-```
-
-Uses DENSE_RANK() window function to rank top 4 foods per city. TRIM and LOWER normalize food names. Groups by city and food, sums quantities ordered.
-
-**Insight**: City-specific food preferences drive strategy. Hyderabad shows highest Biryani orders (2,876), indicating regional food culture impact. Bangalore prefers diverse options (Biryani, Butter Chicken, Dosa). Delhi favors North Indian (Butter Chicken, Rogan Josh, Tandoori Chicken).
-
----
-
-## Part 5: RFM Customer Segmentation
-
-### Overview
-Segment customers by recency, frequency, and monetary value for targeted retention and acquisition strategies.
-
-### Step 5.1: Calculate RFM Metrics
-
-```sql
-CREATE view customer_rfm_analysis AS
-
-SELECT
-
-u.user_id,
-
-u.city,
-
-u.age,
-
-u.gender,
-
-u.gold_member,
-
-datediff(CURDATE(), MAX(STR_TO_DATE(o.order_time, '%Y-%m-%d %H:%i:%s'))) as recency,
-
-COUNT(o.order_id) as frequency,
-
-SUM(o.total_price) AS monetary,
-
-AVG(o.total_price) as avg_order_value
-
-FROM users u
-
-JOIN app_sessions a
-
-ON u.user_id = a.user_id
-
-JOIN orders o
-
-ON o.app_session_id = a.app_session_id
-
-GROUP BY u.user_id, u.city, u.age,u.gender,u.gold_member;
-```
-
-Calculates for each user: recency (days since last order), frequency (order count), monetary (total spend), AOV (average order value). Groups by user ID and attributes.
-
-### Step 5.2: Create RFM Scoring
-
-```sql
-CREATE VIEW rfm_analysis_score AS
-
-SELECT *,
-
-CASE
-
-WHEN recency BETWEEN 155 AND 228 THEN 5
-
-WHEN recency BETWEEN 229 AND 302 THEN 4
-
-WHEN recency BETWEEN 303 AND 376 THEN 3
-
-WHEN recency BETWEEN 377 AND 450 THEN 2
-
-ELSE 1
-
-END AS recency_score,
-
-CASE
-
-WHEN frequency <= 10 THEN 5
-
-WHEN frequency <= 7 THEN 4
-
-WHEN frequency <= 5 THEN 3
-
-WHEN frequency <= 3 THEN 2
-
-ELSE 1
-
-END AS frequency_score,
-
-CASE
-
-WHEN monetary BETWEEN 104 AND 1590 THEN 1
-
-WHEN monetary BETWEEN 1591 AND 3076 THEN 2
-
-WHEN monetary BETWEEN 3077 AND 4562 THEN 3
-
-WHEN monetary BETWEEN 4563 AND 6048 THEN 4
-
-ELSE 5
-
-END AS monetary_score
-
-FROM customer_rfm_analysis;
-```
-
-Assigns 1-5 scores based on quartile distribution. Recency: 5 = most recent. Frequency: 5 = most frequent. Monetary: 5 = highest spend.
-
-### Step 5.3: Create RFM Segments
-
-```sql
-CREATE VIEW rfm_segments AS
-
-SELECT
-
-user_id,
-
-city,
-
-gold_member,
-
-recency,
-
-frequency,
-
-monetary,
-
-recency_score,
-
-frequency_score,
-
-monetary_score,
-
-CASE
-
-WHEN recency_score >= 4 AND frequency_score >= 4 AND monetary_score >= 4 THEN 'Champions'
-
-WHEN recency_score >= 3 AND frequency_score >= 3 THEN 'Loyal Customers'
-
-WHEN recency_score >= 4 AND frequency_score < 3 THEN 'Potential Loyalists'
-
-WHEN frequency_score > 2 AND recency_score < 3 THEN 'At-Risk'
-
-ELSE 'Lost'
-
-END AS rfm_segment
-
-FROM rfm_analysis_score;
-```
-
-Maps RFM scores to business segments. Champions: high on all three metrics. Loyal Customers: good recency AND good frequency. Potential Loyalists: recent but not frequent yet. At-Risk: was frequent but now inactive. Lost: inactive AND infrequent.
-
-### Step 5.4: Aggregate RFM Segments
-
-```sql
-SELECT
-
-rfm_segment,
-
-COUNT(DISTINCT user_id) AS num_customers,
-
-ROUND(COUNT(DISTINCT user_id) * 100 / SUM(COUNT(DISTINCT user_id)) OVER (), 2) AS pct_of_customer_base,
-
-ROUND(AVG(recency), 1) AS avg_recency_days,
-
-ROUND(AVG(frequency), 1) AS avg_frequency_orders,
-
-ROUND(AVG(monetary), 2) AS avg_lifetime_value,
-
-ROUND(SUM(monetary), 2) AS segment_total_revenue,
-
-ROUND(SUM(monetary) * 100 / SUM(SUM(monetary)) OVER (), 2) AS pct_of_total_revenue,
-
-ROUND(
-
-    SUM(CASE WHEN gold_member = 1 THEN 1 ELSE 0 END) * 100 / NULLIF(COUNT(DISTINCT user_id), 0),
-
-    2
-
-) AS gold_member_adoption_pct
-
-FROM rfm_segments
-
-GROUP BY rfm_segment
-
-ORDER BY segment_total_revenue DESC;
-```
-
-Summarizes each segment with customer count, revenue contribution, engagement metrics, and Gold membership adoption.
-
-**Insight**: Champions (737 users, 30.6% revenue) - recently active, highest frequency (5.6 orders), high LTV (₹4,185). Loyal Customers (3,103 users, 60.3% revenue) - core engine, moderate activity. Potential Loyalists (903 users, 9% revenue) - critical CRITICAL: recently ordered (8 days) but very low frequency (1.1 orders). Next 60 days are make-or-break before churn. At-Risk (245 users) - inactive 134 days, was somewhat frequent, target for win-back. Lost (152 users) - permanently churned, deprioritize.
-
-### Step 5.5: RFM by City
-
-```sql
-SELECT
-
-rfm_segment,
-
-city,
-
-COUNT(DISTINCT user_id) AS no_of_customers,
-
-ROUND(AVG(monetary), 2) AS avg_AOV,
-
-ROUND(AVG(monetary), 2) AS avg_total_spend,
-
-ROUND(SUM(monetary), 2) AS total_revenue_by_segment_city,
-
-ROUND(SUM(monetary) * 100 / SUM(SUM(monetary)) OVER (PARTITION BY rfm_segment), 2) AS pct_revenue_within_segment,
-
-ROUND(SUM(monetary) * 100 / SUM(SUM(monetary)) OVER (), 2) AS pct_revenue_of_company
-
-FROM rfm_segments
-
-GROUP BY rfm_segment, city
-
-ORDER BY rfm_segment, total_revenue_by_segment_city DESC;
-```
-
-Breaks down each RFM segment by city to identify geographic concentration and market opportunities.
-
-**Insight**: Kolkata leads Champions segment (138 users, 18.3% of Champions revenue) indicating premium high-loyalty market. Hyderabad has highest Loyal Customers (554) and Potential Loyalists (156) - largest upgrade-ready base. Delhi mirrors Kolkata pattern with high Champions and Loyal customers. Strategy: Kolkata/Delhi premiumization; Hyderabad habit-building and conversion.
-
-### Step 5.6: RFM by Gold Membership
-
-```sql
-SELECT
-
-rfm_segment,
-
-gold_member,
-
-CASE WHEN gold_member = 1 THEN 'Gold' ELSE 'Non-Gold' END AS membership,
-
-COUNT(DISTINCT user_id) AS num_customers,
-
-ROUND(AVG(monetary), 2) AS avg_lifetime_value,
-
-ROUND(SUM(monetary), 2) AS total_segment_revenue
-
-FROM rfm_segments
-
-GROUP BY rfm_segment, gold_member
-
-ORDER BY rfm_segment, gold_member DESC;
-```
-
-Breaks down each RFM segment by Gold membership status to identify conversion opportunities.
-
-**Insight**: Majority of revenue comes from non-Gold members (81% overall). Champions: 595 non-Gold (₹24.8L, 80.6%) vs 142 Gold (₹5.98L, 19.4%). Loyal Customers: 2,519 non-Gold (₹49.3L, 81.2%) vs 584 Gold (₹11.4L, 18.8%). Gold members have similar or slightly higher LTV, indicating membership correlates with value extraction but current adoption is low. Massive conversion opportunity from non-Gold to Gold tiers.
-
----
-
-## Next Steps
-
-1. Save all queries as executable SQL files
-2. Run analysis sequentially from Part 1 through Part 5
-3. Export results for visualization and reporting
+    AVG(o.net_revenue_all_orders) AS net_revenue_per_order
+FROM pageviews_per_session s
+LEFT JOIN orders_per_sessions o
+ON s.app_session_id = o.app_session_id;
