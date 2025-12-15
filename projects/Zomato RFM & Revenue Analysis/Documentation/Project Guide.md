@@ -52,94 +52,148 @@ This project answers:
 ## 🧩 PART 1: Database Setup & Data Cleaning
 
 ### Objective
-Validate data integrity before analysis.
+## 🔍 Initial Data Checks
+
+### User & Order Counts
 
 ```sql
-CREATE DATABASE zomato;
-USE zomato;
+SELECT COUNT(*) AS total_orders FROM orders;
+
+SELECT COUNT(DISTINCT user_id) AS unique_users FROM users;
 ```
-#Checking Zomato Data #
-#Users
-Select count(*) AS Total_Users from orders;
-Select count(DISTINCT user_id) AS Unique_Users From users;
-# 15000 orders total comin from 5000 unique users as per data
 
-# De-Duplicates
-select count(*) AS Total_orders,
-count(distinct order_id) AS distinct_orders,
-count(*) - count(distinct order_id)
-from orders;
+**Observation:**  
+- 15,000 total orders  
+- 5,000 unique users  
+- Indicates repeat ordering behavior (~3 orders per user)
 
-#### --- Data Cleaning --- ###
-select *
-from app_sessions;
-
-# NULL UTM Handling
-update app_sessions
-set utm_source = "Direct"
-where utm_source IS NULL;
- 
-## Fixing Date Values:
-
-## 1) Changing Orders Date
-Alter table orders
-modify column order_time DATETIME; 
-Alter table orders
-modify column delivery_time DATETIME;
-
-#2) Changing signup_dates
-Alter table users
-modify column signup_date DATETIME;
-
-# 3) Changing Created AT Order Date
-alter table order_items_cancelled
-modify column created_at DATETIME;
-# 4) Changing App session dates
-Alter table app_sessions
-modify column created_at DATETIME;
-
-## Adding flag for free deliveries
-alter table orders
-add column delivery_flag varchar(50);
-
-update orders
-set delivery_flag = CASE
-WHEN delivery_fee_paid = 0 Then "Complimentary"
-ELSE "Paid"
-END;
-
-ALTER table orders
-add column order_day INT, 
-add column order_month INT, 
-add column order_year INT,
-add column min_time_delivery INT;
-
-ALTER table orders
-add column order_hour INT;
-
-Update orders
-set order_day = day(order_time);
-
-update orders
-set order_month = month(order_time);
-
-update orders
-set order_year = year(order_time);
-
-update orders
-set order_hour = hour(order_time);
-
-update orders
-set min_time_delivery = timestampdiff(MINUTE,order_time, delivery_time);
-
-select *
-from orders;
-
-#Check for duplicates:
-SELECT COUNT(*), COUNT(order_id)
-FROM orders
-HAVING COUNT(order_id) > 1;
 ---
+
+## 🧪 Duplicate Checks
+
+```sql
+SELECT 
+    COUNT(*) AS total_orders,
+    COUNT(DISTINCT order_id) AS distinct_orders,
+    COUNT(*) - COUNT(DISTINCT order_id) AS duplicate_orders
+FROM orders;
+```
+
+**Result:**  
+No duplicate `order_id` values detected.
+
+---
+
+## 🧹 Data Cleaning Steps
+
+### Review App Sessions
+
+```sql
+SELECT * FROM app_sessions;
+```
+
+---
+
+### NULL UTM Source Handling
+
+Assumption: Missing UTM values represent **Direct traffic**.
+
+```sql
+UPDATE app_sessions
+SET utm_source = 'Direct'
+WHERE utm_source IS NULL;
+```
+
+---
+
+## 🕒 Date & Time Standardization
+
+To ensure accurate time-based analysis, all date fields were converted to `DATETIME` format.
+
+### Orders Table
+
+```sql
+ALTER TABLE orders MODIFY COLUMN order_time DATETIME;
+ALTER TABLE orders MODIFY COLUMN delivery_time DATETIME;
+```
+
+### Users Table
+
+```sql
+ALTER TABLE users MODIFY COLUMN signup_date DATETIME;
+```
+
+### Cancelled Orders Table
+
+```sql
+ALTER TABLE order_items_cancelled MODIFY COLUMN created_at DATETIME;
+```
+
+### App Sessions Table
+
+```sql
+ALTER TABLE app_sessions MODIFY COLUMN created_at DATETIME;
+```
+
+---
+
+## 🚚 Delivery Fee Flag Creation
+
+Adds interpretability for free vs paid deliveries.
+
+```sql
+ALTER TABLE orders ADD COLUMN delivery_flag VARCHAR(50);
+
+UPDATE orders
+SET delivery_flag =
+    CASE
+        WHEN delivery_fee_paid = 0 THEN 'Complimentary'
+        ELSE 'Paid'
+    END;
+```
+
+---
+
+## 📅 Date Feature Engineering
+
+Additional columns added to support **time-series and cohort analysis**.
+
+```sql
+ALTER TABLE orders
+ADD COLUMN order_day INT,
+ADD COLUMN order_month INT,
+ADD COLUMN order_year INT,
+ADD COLUMN order_hour INT,
+ADD COLUMN min_time_delivery INT;
+```
+
+### Populate Derived Columns
+
+```sql
+UPDATE orders SET order_day = DAY(order_time);
+UPDATE orders SET order_month = MONTH(order_time);
+UPDATE orders SET order_year = YEAR(order_time);
+UPDATE orders SET order_hour = HOUR(order_time);
+UPDATE orders 
+SET min_time_delivery = TIMESTAMPDIFF(MINUTE, order_time, delivery_time);
+```
+
+---
+
+## 🔁 Final Duplicate Validation
+
+```sql
+SELECT order_id, COUNT(*)
+FROM orders
+GROUP BY order_id
+HAVING COUNT(*) > 1;
+```
+
+**Expected Result:**  
+Zero rows returned.
+
+---
+
 
 ## 🧭 PART 2: UX Funnel Analysis
 
