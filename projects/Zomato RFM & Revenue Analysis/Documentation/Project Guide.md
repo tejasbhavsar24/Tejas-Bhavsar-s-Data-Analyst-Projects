@@ -193,10 +193,19 @@ HAVING COUNT(*) > 1;
 Zero rows returned.
 
 ---
-# First Clean the data
-# Once completely deduplicated and all columns for date time derived
-# We will start with Exploratory Data Analysis and Mdoelling
-# We look at 1) Funnel, 2)Channel and Device, 3) City / Location Wise, 4) RFM Segments - this includes the assumptions for developing scores, and creating the semgments, their calculation and finally how model makes RMF Score, 5) Month on Month Revenue Calculation - where I have taken used LAG Function and PRECEEDING AND CURRENT AND PREVIOUS FUNCTIONS with WINDOW, 6) Peak Order Demand Pattern Analysis by days and hours using HOUR(), WEEKDAYS() DATETIME METHODS on the converted datetime type order and delivery times fields in ORDERS Table , 7) Food Rescue Feature Analysis and Its Revenue And Profit Impact using Assumptions that it has a net zero impact on profits and actually helps reduce losses and rather Zomato earns from marginal gains in platform fees instead. 8) Food and Restaurant Analysis and some light Market Basket Analysis on most commonly bought together food items combos, 9) Zomato Gold Vs Non-Gold User Behaviour and looking at Wallet vs other modes of payment preferences in payments
+## First Clean the data
+## Once completely deduplicated and all columns for date time derived
+## We will start with Exploratory Data Analysis and Mdoelling
+## We look at:
+### 1) Funnel Analysis
+2)Channel and Device 
+3) City / Location Wise 
+4) RFM Segments - this includes the assumptions for developing scores, and creating the semgments, their calculation and finally how model makes RMF Score 
+5) Month on Month Revenue Calculation - where I have taken used LAG Function and PRECEEDING AND CURRENT AND PREVIOUS FUNCTIONS with WINDOW 
+6) Peak Order Demand Pattern Analysis by days and hours using HOUR(), WEEKDAYS() DATETIME METHODS on the converted datetime type order and delivery times fields in ORDERS Table 
+7) Food Rescue Feature Analysis and Its Revenue And Profit Impact using Assumptions that it has a net zero impact on profits and actually helps reduce losses and rather Zomato earns from marginal gains in platform fees instead
+8) Food and Restaurant Analysis and some light Market Basket Analysis on most commonly bought together food items combos
+9) Zomato Gold Vs Non-Gold User Behaviour and looking at Wallet vs other modes of payment preferences in payments
 
 ## Part 2: UX Funnel Analysis
 
