@@ -195,7 +195,10 @@ Zero rows returned.
 ---
 ## STEPS:
 
-### Data Cleaned, Deduplicated and Variable converted to correct type for handling data and time. Now ready for EDA Queries for answering objectives and Modelling for RFM. Follow the Readme for logic behind revenue calculation assumptions in the Assumptions section. Below are complete SQL Queries to follow through in order of my project, and the processed_data contains files that provide CSV output as a result of running these queries on the cleaned version of raw_data CSV files.
+### 
+- Data Cleaned, Deduplicated and Variable converted to correct type for handling data and time. Now ready for EDA Queries for answering objectives and Modelling for RFM.
+- Follow the Readme for logic behind revenue calculation assumptions in the Assumptions section.
+- Below are complete SQL Queries to follow through in order of my project, and the processed_data contains files that provide CSV output as a result of running these queries on the cleaned version of raw_data CSV files.
 
 ---
 
@@ -607,7 +610,9 @@ ORDER BY rfm_segment, gold_member DESC;
 ```
 
 ---
-### Assumption: Zomato earns only 30-35% of GMV as it revenue comes from in form of platform fees and commissions that are assumed to be 30% of Total Price Paid by a customer - Delivery Fee Paid to a Delivery Partner. Hence This is an inferred revenue or Net Revenue calculation used here.
+### Assumption: 
+- Zomato earns only 30-35% of GMV as it revenue comes from in form of platform fees and commissions that are assumed to be 30% of Total Price Paid by a customer - Delivery Fee Paid to a Delivery Partner. Hence This is an inferred revenue or Net Revenue calculation used here.
+  
 ### Step 6: Month on Month Calculations of Revenue
 
 ```sql
@@ -697,10 +702,10 @@ ORDER BY order_hour ASC;
 ---
 Step 8: Food Rescue Feature Analysis
 ### Assumption:
-Platform revenues and commissions are only charged on completed orders
-Entire Delivery fees paid to drivers for delivery to new rescue customer 
-Zomato keeps only tax on new order rest is paid as refund to old and restaurant and delivery fee to partner delivery person
-This assumption is for keeping rescue order as net zero impact on platform as mentioned in Zomato Blog and by Mr Deepinder Goyal
+- Platform revenues and commissions are only charged on completed orders
+- Entire Delivery fees paid to drivers for delivery to new rescue customer
+- Zomato keeps only tax on new order rest is paid as refund to old and restaurant and delivery fee to partner delivery person
+- This assumption is for keeping rescue order as net zero impact on platform as mentioned in Zomato Blog and by Mr Deepinder Goyal
 ###
 
 ### Step 8.1: Creating View Netorders
