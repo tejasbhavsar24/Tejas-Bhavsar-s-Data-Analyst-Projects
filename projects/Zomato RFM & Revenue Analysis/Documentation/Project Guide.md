@@ -193,19 +193,11 @@ HAVING COUNT(*) > 1;
 Zero rows returned.
 
 ---
-## First Clean the data
-## Once completely deduplicated and all columns for date time derived
-## We will start with Exploratory Data Analysis and Mdoelling
-## We look at:
-### 1) Funnel Analysis
-### 2)Channel and Device 
-### 3) City / Location Wise 
-### 4) RFM Segments - this includes the assumptions for developing scores, and creating the semgments, their calculation and finally how model makes RMF Score 
-### 5) Month on Month Revenue Calculation - where I have taken used LAG Function and PRECEEDING AND CURRENT AND PREVIOUS FUNCTIONS with WINDOW 
-### 6) Peak Order Demand Pattern Analysis by days and hours using HOUR(), WEEKDAYS() DATETIME METHODS on the converted datetime type order and delivery times fields in ORDERS Table 
-### 7) Food Rescue Feature Analysis and Its Revenue And Profit Impact using Assumptions that it has a net zero impact on profits and actually helps reduce losses and rather Zomato earns from marginal gains in platform fees instead
-### 8) Food and Restaurant Analysis and some light Market Basket Analysis on most commonly bought together food items combos
-### 9) Zomato Gold Vs Non-Gold User Behaviour and looking at Wallet vs other modes of payment preferences in payments
+## STEPS:
+
+### Data Cleaned, Deduplicated and Variable converted to correct type for handling data and time. Now ready for EDA Queries for answering objectives and Modelling for RFM. Follow the Readme for logic behind revenue calculation assumptions in the Assumptions section. Below are complete SQL Queries to follow through in order of my project, and the processed_data contains files that provide CSV output as a result of running these queries on the cleaned version of raw_data CSV files.
+
+---
 
 ## Part 2: UX Funnel Analysis
 
@@ -703,6 +695,13 @@ ORDER BY order_hour ASC;
 ```
 ---
 Step 8: Food Rescue Feature Analysis
+###
+-- Platform revenues and commissions are only charged on completed orders,
+-- delivery fees paid to drivers for new rescue customer delivery
+-- zomato keeps only tax on new order rest is paid as refund to old
+-- and restaurant and delivery fee to partner delivery person
+-- so assumption to keep rescue order as net zero impact on platform as mentioned in Zomato Blog and by Mr Deepinder Goyal
+###
 ### Step 8.1: Creating View Netorders
 
 ```sql
